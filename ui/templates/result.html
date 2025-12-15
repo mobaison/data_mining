@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block title %}Results - Heart Disease Prediction{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <!-- Prediction Result Card -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+        <!-- Result Header -->
+        <div class="{% if result.risk_level == 'High' %}bg-gradient-to-r from-red-600 to-orange-600
+                    {% elif result.risk_level == 'Moderate' %}bg-gradient-to-r from-yellow-600 to-orange-500
+                    {% else %}bg-gradient-to-r from-green-600 to-teal-500{% endif %} text-white p-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold mb-2">Prediction Results</h1>
+                    <p class="opacity-90">Patient: {{ patient_data.patient_name }} | Age: {{ patient_data.age }}</p>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <span class="inline-block px-6 py-3 bg-white bg-opacity-20 rounded-full text-lg font-bold">
+                        ID: {{ prediction_id }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Result -->
+        <div class="p-8">
+            <div class="text-center mb-8">
+                <div class="inline-block p-6 rounded-2xl 
+                    {% if result.risk_level == 'High' %}bg-red-50 border-2 border-red-200
+                    {% elif result.risk_level == 'Moderate' %}bg-yellow-50 border-2 border-yellow-200
+                    {% else %}bg-green-50 border-2 border-green-200{% endif %}">
+                    <div class="text-5xl font-bold mb-2 
+                        {% if result.risk_level == 'High' %}text-red-600
+                        {% elif result.risk_level == 'Moderate' %}text-yellow-600
+                        {% else %}text-green-600{% endif %}">
+                        {{ result.confidence }}%
+                    </div>
+                    <div class="text-xl font-semibold text-gray-700">Confidence Level</div>
+                </div>
+                
+                <h2 class="text-2xl font-bold text-gray-800 mt-6 mb-2">
+                    {% if result.result == "No Heart Disease" %}
+                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                    {% else %}
+                    <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
+                    {% endif %}
+                    {{ result.result }}
+                </h2>
+                
+                <div class="inline-block px-6 py-2 rounded-full text-lg font-bold
+                    {% if result.risk_level == 'High' %}bg-red-100 text-red-800
+                    {% elif result.risk_level == 'Moderate' %}bg-yellow-100 text-yellow-800
+                    {% else %}bg-green-100 text-green-800{% endif %}">
+                    {{ result.risk_level }} Risk
+                </div>
+            </div>
+            
+            <!-- Risk Factors -->
+            {% if result.details %}
+            <div class="mb-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-exclamation-circle text-orange-500 mr-2"></i>
+                    Key Risk Factors Identified
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% for factor in result.details %}
+                    <div class="border-l-4 
+                        {% if factor.level == 'High' %}border-red-500 bg-red-50
+                        {% elif factor.level == 'Moderate' %}border-yellow-500 bg-yellow-50
+                        {% else %}border-blue-500 bg-blue-50{% endif %} p-4 rounded">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-gray-800">{{ factor.factor }}</h4>
+                                <p class="text-gray-600 text-sm mt-1">{{ factor.description }}</p>
+                            </div>
+                            <span class="px-3 py-1 text-xs font-bold rounded-full
+                                {% if factor.level == 'High' %}bg-red-100 text-red-800
+                                {% elif factor.level == 'Moderate' %}bg-yellow-100 text-yellow-800
+                                {% else %}bg-blue-100 text-blue-800{% endif %}">
+                                {{ factor.level }} Risk
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Patient Data Summary -->
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Patient Data Summary</h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div class="text-center p-4 bg-white rounded-lg">
+                        <div class="text-2xl font-bold text-blue-600">{{ patient_data.age }}</div>
+                        <div class="text-sm text-gray-600">Age</div>
+                    </div>
+                    <div class="text-center p-4 bg-white rounded-lg">
+                        <div class="text-2xl font-bold text-purple-600">{{ patient_data.sex }}</div>
+                        <div class="text-sm text-gray-600">Sex</div>
+                    </div>
+                    <div class="text-center p-4 bg-white rounded-lg">
+                        <div class="text-2xl font-bold text-red-600">{{ patient_data.cholesterol }}</div>
+                        <div class="text-sm text-gray-600">Cholesterol</div>
+                    </div>
+                    <div class="text-center p-4 bg-white rounded-lg">
+                        <div class="text-2xl font-bold text-green-600">{{ patient_data.max_hr }}</div>
+                        <div class="text-sm text-gray-600">Max HR</div>
+                    </div>
+                    <div class="text-center p-4 bg-white rounded-lg">
+                        <div class="text-2xl font-bold text-yellow-600">{{ patient_data.oldpeak }}</div>
+                        <div class="text-sm text-gray-600">ST Depression</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <a href="{{ url_for('predict') }}" 
+           class="flex items-center justify-center bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-lg font-bold hover:opacity-90 transition">
+            <i class="fas fa-plus-circle mr-3"></i>
+            New Prediction
+        </a>
+        
+        <a href="{{ url_for('dashboard') }}" 
+           class="flex items-center justify-center bg-gradient-to-r from-green-600 to-teal-600 text-white p-4 rounded-lg font-bold hover:opacity-90 transition">
+            <i class="fas fa-chart-bar mr-3"></i>
+            View Dashboard
+        </a>
+        
+        <button onclick="printResults()"
+                class="flex items-center justify-center bg-gray-600 text-white p-4 rounded-lg font-bold hover:bg-gray-700 transition">
+            <i class="fas fa-print mr-3"></i>
+            Print Results
+        </button>
+    </div>
+    
+    <!-- Medical Recommendations -->
+    <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-8 mb-8">
+        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-stethoscope text-blue-600 mr-2"></i>
+            Recommendations
+        </h3>
+        
+        {% if result.risk_level == 'High' %}
+        <div class="space-y-4">
+            <div class="flex items-start">
+                <i class="fas fa-exclamation-triangle text-red-500 text-xl mt-1 mr-3"></i>
+                <div>
+                    <h4 class="font-bold text-gray-800">Immediate Action Recommended</h4>
+                    <p class="text-gray-600">Consult a cardiologist for comprehensive evaluation</p>
+                </div>
+            </div>
+            <div class="flex items-start">
+                <i class="fas fa-clinic-medical text-blue-500 text-xl mt-1 mr-3"></i>
+                <div>
+                    <h4 class="font-bold text-gray-800">Suggested Tests</h4>
+                    <p class="text-gray-600">Stress test, Echocardiogram, Coronary angiography</p>
+                </div>
+            </div>
+        </div>
+        {% elif result.risk_level == 'Moderate' %}
+        <div class="space-y-4">
+            <div class="flex items-start">
+                <i class="fas fa-calendar-check text-yellow-500 text-xl mt-1 mr-3"></i>
+                <div>
+                    <h4 class="font-bold text-gray-800">Regular Monitoring</h4>
+                    <p class="text-gray-600">Schedule regular check-ups with your physician</p>
+                </div>
+            </div>
+            <div class="flex items-start">
+                <i class="fas fa-heart text-red-500 text-xl mt-1 mr-3"></i>
+                <div>
+                    <h4 class="font-bold text-gray-800">Lifestyle Changes</h4>
+                    <p class="text-gray-600">Consider diet modification and regular exercise</p>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="space-y-4">
+            <div class="flex items-start">
+                <i class="fas fa-check-circle text-green-500 text-xl mt-1 mr-3"></i>
+                <div>
+                    <h4 class="font-bold text-gray-800">Maintain Healthy Lifestyle</h4>
+                    <p class="text-gray-600">Continue regular exercise and balanced diet</p>
+                </div>
+            </div>
+            <div class="flex items-start">
+                <i class="fas fa-calendar-alt text-blue-500 text-xl mt-1 mr-3"></i>
+                <div>
+                    <h4 class="font-bold text-gray-800">Regular Check-ups</h4>
+                    <p class="text-gray-600">Annual health check-ups recommended</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="mt-6 p-4 bg-white rounded-lg">
+            <p class="text-gray-600 text-sm">
+                <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                <strong>Disclaimer:</strong> This prediction is based on machine learning algorithms and should not replace professional medical advice. Always consult healthcare providers for diagnosis and treatment.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function printResults() {
+    window.print();
+}
+
+// Share results (simulated)
+function shareResults() {
+    if (navigator.share) {
+        navigator.share({
+            title: 'Heart Disease Prediction Results',
+            text: 'Check out my heart disease risk assessment results',
+            url: window.location.href
+        });
+    } else {
+        alert('Copy this link to share: ' + window.location.href);
+    }
+}
+</script>
+{% endblock %}

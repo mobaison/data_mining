@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Heart Disease Prediction{% endblock %}
+
+{% block content %}
+<div class="text-center mb-12">
+    <h1 class="text-4xl font-bold text-gray-800 mb-4">
+        Heart Disease Prediction System
+    </h1>
+    <p class="text-gray-600 text-lg max-w-3xl mx-auto">
+        Advanced prediction using Support Vector Machine (SVM) algorithm trained on UCI Heart Disease Dataset.
+        Early detection for better cardiovascular health management.
+    </p>
+</div>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+    <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+        <div class="flex items-center">
+            <div class="bg-blue-100 p-3 rounded-lg mr-4">
+                <i class="fas fa-chart-line text-blue-600 text-2xl"></i>
+            </div>
+            <div>
+                <h3 class="text-2xl font-bold text-gray-800">{{ total_predictions }}</h3>
+                <p class="text-gray-600">Total Predictions</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-red-500">
+        <div class="flex items-center">
+            <div class="bg-red-100 p-3 rounded-lg mr-4">
+                <i class="fas fa-heartbeat text-red-600 text-2xl"></i>
+            </div>
+            <div>
+                <h3 class="text-2xl font-bold text-gray-800">{{ high_risk }}</h3>
+                <p class="text-gray-600">High Risk Cases</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+        <div class="flex items-center">
+            <div class="bg-green-100 p-3 rounded-lg mr-4">
+                <i class="fas fa-shield-alt text-green-600 text-2xl"></i>
+            </div>
+            <div>
+                <h3 class="text-2xl font-bold text-gray-800">{{ (total_predictions - high_risk) if total_predictions else 0 }}</h3>
+                <p class="text-gray-600">Low Risk Cases</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+    <div class="bg-white rounded-xl shadow-lg p-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Key Features</h2>
+        <div class="space-y-4">
+            <div class="flex items-start">
+                <i class="fas fa-brain text-blue-500 text-xl mt-1 mr-3"></i>
+                <div>
+                    <h4 class="font-semibold text-gray-800">SVM Algorithm</h4>
+                    <p class="text-gray-600">Trained on 303 instances from UCI dataset</p>
+                </div>
+            </div>
+            <div class="flex items-start">
+                <i class="fas fa-sliders-h text-purple-500 text-xl mt-1 mr-3"></i>
+                <div>
+                    <h4 class="font-semibold text-gray-800">9 Clinical Parameters</h4>
+                    <p class="text-gray-600">Age, Cholesterol, Max HR, ST depression, and more</p>
+                </div>
+            </div>
+            <div class="flex items-start">
+                <i class="fas fa-chart-pie text-green-500 text-xl mt-1 mr-3"></i>
+                <div>
+                    <h4 class="font-semibold text-gray-800">Analytics Dashboard</h4>
+                    <p class="text-gray-600">Visual insights and prediction trends</p>
+                </div>
+            </div>
+        </div>
+        <div class="mt-8">
+            <a href="{{ url_for('predict') }}" class="inline-flex items-center bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition">
+                <i class="fas fa-plus mr-2"></i> Make New Prediction
+            </a>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-lg p-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Recent Predictions</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="px-4 py-3 text-left text-gray-600">Patient</th>
+                        <th class="px-4 py-3 text-left text-gray-600">Age</th>
+                        <th class="px-4 py-3 text-left text-gray-600">Risk</th>
+                        <th class="px-4 py-3 text-left text-gray-600">Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pred in recent_predictions %}
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-4 py-3">{{ pred.patient_name }}</td>
+                        <td class="px-4 py-3">{{ pred.age }}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-3 py-1 rounded-full text-sm font-semibold 
+                                {% if pred.risk_level == 'High' %}bg-red-100 text-red-800
+                                {% elif pred.risk_level == 'Moderate' %}bg-yellow-100 text-yellow-800
+                                {% else %}bg-green-100 text-green-800{% endif %}">
+                                {{ pred.risk_level }}
+                            </span>
+                        </td>
+                       <!-- In templates/index.html, find the table section and update: -->
+                        <td class="px-4 py-3 text-gray-500 text-sm">
+                            {% if pred.timestamp %}
+                                {{ pred.timestamp.split(' ')[1] if pred.timestamp and ' ' in pred.timestamp else pred.timestamp }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if not recent_predictions %}
+        <div class="text-center py-8 text-gray-500">
+            <i class="fas fa-inbox text-4xl mb-4"></i>
+            <p>No predictions yet. Make your first prediction!</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- About Section -->
+<div id="about" class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-8 mb-8">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">About This System</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-3">Dataset Information</h3>
+            <ul class="space-y-2 text-gray-600">
+                <li><i class="fas fa-database text-blue-500 mr-2"></i>UCI Heart Disease Dataset (Cleveland)</li>
+                <li><i class="fas fa-users text-blue-500 mr-2"></i>303 patient records</li>
+                <li><i class="fas fa-sliders-h text-blue-500 mr-2"></i>14 clinical features</li>
+                <li><i class="fas fa-bullseye text-blue-500 mr-2"></i>Binary classification task</li>
+            </ul>
+        </div>
+        <div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-3">Medical Disclaimer</h3>
+            <p class="text-gray-600">
+                This system is for educational and research purposes only. The predictions are based on 
+                machine learning algorithms and should not be used for actual medical diagnosis. 
+                Always consult qualified healthcare professionals for medical advice.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,1 @@
+id,patient_name,age,sex,chest_pain_type,cholesterol,fasting_bs,max_hr,exercise_angina,oldpeak,st_slope,prediction_result,confidence,risk_level,timestamp

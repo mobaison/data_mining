@@ -1,0 +1,323 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Heart Disease Prediction{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-800">Analytics Dashboard</h1>
+    <p class="text-gray-600">Comprehensive insights from prediction data</p>
+</div>
+
+<!-- Stats Overview -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-sm">Total Predictions</p>
+                <h3 class="text-2xl font-bold text-gray-800">{{ stats.total_predictions }}</h3>
+            </div>
+            <div class="bg-blue-100 p-3 rounded-lg">
+                <i class="fas fa-chart-bar text-blue-600 text-xl"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-sm">High Risk Cases</p>
+                <h3 class="text-2xl font-bold text-gray-800">{{ stats.high_risk }}</h3>
+            </div>
+            <div class="bg-red-100 p-3 rounded-lg">
+                <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-sm">Average Age</p>
+                <h3 class="text-2xl font-bold text-gray-800">{{ stats.average_age }}</h3>
+            </div>
+            <div class="bg-green-100 p-3 rounded-lg">
+                <i class="fas fa-user text-green-600 text-xl"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-sm">Avg Cholesterol</p>
+                <h3 class="text-2xl font-bold text-gray-800">{{ stats.average_cholesterol }}</h3>
+            </div>
+            <div class="bg-purple-100 p-3 rounded-lg">
+                <i class="fas fa-tint text-purple-600 text-xl"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+    <!-- Age Distribution -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Age Distribution</h3>
+        <div id="age-chart" style="height: 300px;"></div>
+    </div>
+    
+    <!-- Risk Level Distribution -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Risk Level Distribution</h3>
+        <div id="risk-chart" style="height: 300px;"></div>
+    </div>
+    
+    <!-- Daily Trends -->
+    <div class="bg-white rounded-xl shadow-lg p-6 lg:col-span-2">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Daily Prediction Trends</h3>
+        <div id="trend-chart" style="height: 350px;"></div>
+    </div>
+</div>
+
+<!-- Gender Distribution -->
+<div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+    <h3 class="text-xl font-bold text-gray-800 mb-6">Gender Distribution</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center">
+                    <div class="bg-blue-100 p-2 rounded-lg mr-3">
+                        <i class="fas fa-mars text-blue-600"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-800">Male</h4>
+                        <p class="text-gray-600">{{ stats.male_count }} patients</p>
+                    </div>
+                </div>
+                <div class="text-2xl font-bold text-blue-600">
+                    {% if stats.total_predictions > 0 %}
+                    {{ (stats.male_count / stats.total_predictions * 100)|round(1) }}%
+                    {% else %}0%{% endif %}
+                </div>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-4">
+                <div class="bg-blue-600 h-4 rounded-full" 
+                     style="width: {% if stats.total_predictions > 0 %}{{ (stats.male_count / stats.total_predictions * 100) }}%{% else %}0%{% endif %}">
+                </div>
+            </div>
+        </div>
+        
+        <div>
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center">
+                    <div class="bg-pink-100 p-2 rounded-lg mr-3">
+                        <i class="fas fa-venus text-pink-600"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-800">Female</h4>
+                        <p class="text-gray-600">{{ stats.female_count }} patients</p>
+                    </div>
+                </div>
+                <div class="text-2xl font-bold text-pink-600">
+                    {% if stats.total_predictions > 0 %}
+                    {{ (stats.female_count / stats.total_predictions * 100)|round(1) }}%
+                    {% else %}0%{% endif %}
+                </div>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-4">
+                <div class="bg-pink-600 h-4 rounded-full" 
+                     style="width: {% if stats.total_predictions > 0 %}{{ (stats.female_count / stats.total_predictions * 100) }}%{% else %}0%{% endif %}">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Predictions Table -->
+<div class="bg-white rounded-xl shadow-lg p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl font-bold text-gray-800">Recent Predictions</h3>
+        <a href="{{ url_for('predict') }}" 
+           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+            <i class="fas fa-plus mr-2"></i> New Prediction
+        </a>
+    </div>
+    
+    <div class="overflow-x-auto">
+        <table class="min-w-full">
+            <thead>
+                <tr class="bg-gray-50">
+                    <th class="px-4 py-3 text-left text-gray-600">Patient</th>
+                    <th class="px-4 py-3 text-left text-gray-600">Age</th>
+                    <th class="px-4 py-3 text-left text-gray-600">Sex</th>
+                    <th class="px-4 py-3 text-left text-gray-600">Cholesterol</th>
+                    <th class="px-4 py-3 text-left text-gray-600">Risk Level</th>
+                    <th class="px-4 py-3 text-left text-gray-600">Confidence</th>
+                    <th class="px-4 py-3 text-left text-gray-600">Time</th>
+                </tr>
+            </thead>
+            <tbody id="predictions-table">
+                <!-- Data will be loaded via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="text-center py-8 text-gray-500" id="loading-message">
+        <i class="fas fa-spinner fa-spin text-2xl mb-4"></i>
+        <p>Loading predictions...</p>
+    </div>
+</div>
+
+<!-- Export Section -->
+<div class="mt-8 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Data Export</h3>
+    <div class="flex flex-wrap gap-4">
+        <button onclick="exportData('csv')"
+                class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition flex items-center">
+            <i class="fas fa-file-csv mr-2"></i> Export as CSV
+        </button>
+        <button onclick="exportData('json')"
+                class="bg-yellow-600 text-white px-6 py-3 rounded-lg hover:bg-yellow-700 transition flex items-center">
+            <i class="fas fa-file-code mr-2"></i> Export as JSON
+        </button>
+        <button onclick="refreshDashboard()"
+                class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition flex items-center">
+            <i class="fas fa-sync-alt mr-2"></i> Refresh Data
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Load charts
+document.addEventListener('DOMContentLoaded', function() {
+    // Age Distribution Chart
+    if ({{ age_chart|tojson }}) {
+        const ageData = JSON.parse('{{ age_chart|safe }}');
+        Plotly.newPlot('age-chart', ageData.data, ageData.layout);
+    }
+    
+    // Risk Level Chart
+    if ({{ risk_chart|tojson }}) {
+        const riskData = JSON.parse('{{ risk_chart|safe }}');
+        Plotly.newPlot('risk-chart', riskData.data, riskData.layout);
+    }
+    
+    // Trend Chart
+    if ({{ trend_chart|tojson }}) {
+        const trendData = JSON.parse('{{ trend_chart|safe }}');
+        Plotly.newPlot('trend-chart', trendData.data, trendData.layout);
+    }
+    
+    // Load predictions table
+    loadPredictions();
+});
+
+// Load predictions via API
+async function loadPredictions() {
+    try {
+        const response = await fetch('/api/predictions');
+        const predictions = await response.json();
+        
+        const tableBody = document.getElementById('predictions-table');
+        const loadingMsg = document.getElementById('loading-message');
+        
+        if (predictions.length === 0) {
+            loadingMsg.innerHTML = `
+                <i class="fas fa-inbox text-3xl mb-4"></i>
+                <p>No predictions found</p>
+            `;
+            return;
+        }
+        
+        loadingMsg.style.display = 'none';
+        
+        predictions.forEach(pred => {
+            const row = document.createElement('tr');
+            row.className = 'border-b hover:bg-gray-50';
+            row.innerHTML = `
+                <td class="px-4 py-3">${pred.patient_name}</td>
+                <td class="px-4 py-3">${pred.age}</td>
+                <td class="px-4 py-3">${pred.sex}</td>
+                <td class="px-4 py-3">${pred.cholesterol || 'N/A'}</td>
+                <td class="px-4 py-3">
+                    <span class="px-3 py-1 rounded-full text-sm font-semibold 
+                        ${pred.risk_level === 'High' ? 'bg-red-100 text-red-800' : 
+                          pred.risk_level === 'Moderate' ? 'bg-yellow-100 text-yellow-800' : 
+                          'bg-green-100 text-green-800'}">
+                        ${pred.risk_level}
+                    </span>
+                </td>
+                <td class="px-4 py-3">${pred.confidence}%</td>
+                '<td class="px-4 py-3 text-gray-500 text-sm">' + 
+                    (pred.timestamp ? pred.timestamp.split(' ')[1] || pred.timestamp : 'N/A') + 
+                '</td>'
+            `;
+            tableBody.appendChild(row);
+        });
+        
+    } catch (error) {
+        console.error('Error loading predictions:', error);
+        document.getElementById('loading-message').innerHTML = `
+            <i class="fas fa-exclamation-triangle text-red-500 text-2xl mb-4"></i>
+            <p>Error loading data</p>
+        `;
+    }
+}
+
+// Export data
+async function exportData(format) {
+    try {
+        const response = await fetch('/api/predictions');
+        const data = await response.json();
+        
+        if (format === 'csv') {
+            // Convert to CSV
+            const headers = ['Patient Name', 'Age', 'Sex', 'Risk Level', 'Confidence', 'Timestamp'];
+            const csvRows = [
+                headers.join(','),
+                ...data.map(row => [
+                    `"${row.patient_name}"`,
+                    row.age,
+                    row.sex,
+                    row.risk_level,
+                    `${row.confidence}%`,
+                    row.timestamp
+                ].join(','))
+            ];
+            
+            const csvContent = csvRows.join('\n');
+            downloadFile(csvContent, 'heart_disease_predictions.csv', 'text/csv');
+            
+        } else if (format === 'json') {
+            // Convert to JSON
+            const jsonContent = JSON.stringify(data, null, 2);
+            downloadFile(jsonContent, 'heart_disease_predictions.json', 'application/json');
+        }
+        
+    } catch (error) {
+        alert('Error exporting data: ' + error.message);
+    }
+}
+
+// Download file helper
+function downloadFile(content, filename, mimeType) {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// Refresh dashboard
+function refreshDashboard() {
+    window.location.reload();
+}
+</script>
+{% endblock %}
