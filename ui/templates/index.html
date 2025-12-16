@@ -111,13 +111,13 @@
                                 {{ pred.risk_level }}
                             </span>
                         </td>
-                       <!-- In templates/index.html, find the table section and update: -->
+                        <!-- In templates/index.html, find the table section and update: -->
                         <td class="px-4 py-3 text-gray-500 text-sm">
-                            {% if pred.timestamp %}
-                                {{ pred.timestamp.split(' ')[1] if pred.timestamp and ' ' in pred.timestamp else pred.timestamp }}
-                            {% endif %}
+                          {% if pred.timestamp %}
+                              {{ pred.timestamp.split(' ')[1] if pred.timestamp and ' ' in pred.timestamp else pred.timestamp }}
+                          {% endif %}
                         </td>
-                    </tr>
+                </tr>
                     {% endfor %}
                 </tbody>
             </table>

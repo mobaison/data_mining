@@ -1,1 +1,3 @@
 id,patient_name,age,sex,chest_pain_type,cholesterol,fasting_bs,max_hr,exercise_angina,oldpeak,st_slope,prediction_result,confidence,risk_level,timestamp
+Mobaison,45,Male,Typical Angina,160,≤120 mg/dl,200,No,2.0,Upsloping,No Heart Disease,80.0,Low,1,2025-12-16 12:04:16
+Raj,40,Male,Atypical Angina,210,>120 mg/dl,160,No,3.0,Upsloping,Heart Disease Detected,80.0,High,1,2025-12-16 12:05:56
